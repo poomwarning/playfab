@@ -29,10 +29,9 @@ public class setprogress : MonoBehaviour {
     {
         nameInput.text = progress.name;
         rankInput.text =  progress.rank;
-        float year1percent = float.Parse(year1progress.text);
-        float accurates = float.Parse(accurate.text);
-        year1percent = progress.year1;
-        accurates = progress.accurate;
+        year1progress.text = progress.year1.ToString();
+        accurate.text = progress.accurate.ToString();
+    
     }
 }
 

@@ -40,13 +40,33 @@ public class playfabma : MonoBehaviour
     }
     public void sendjson()
     {
+        List<Progress> studentsprogress = new List<Progress>();
+       foreach (var item in Setprogresses)
+       {
+           studentsprogress.Add(item.ReturnClass());
+       }
         var request = new UpdateUserDataRequest{
             Data = new Dictionary<string, string>
             {
-                {"Progress", JsonConvert.SerializeObject(Setprogresses[0].ReturnClass())}
+                {"Progress", JsonConvert.SerializeObject(studentsprogress)}
             }
         };
         PlayFabClientAPI.UpdateUserData(request,OnDataSend,OnError);
+    }
+    public void loadjson()
+    {
+        PlayFabClientAPI.GetUserData(new GetUserDataRequest(),recvicejson ,OnError);
+    }
+     void recvicejson(GetUserDataResult result)
+    {
+        Debug.Log("recieved student progress data!");
+        if(result.Data != null && result.Data.ContainsKey("Progress")){
+            List<Progress> studentsprogress = JsonConvert.DeserializeObject<List<Progress>>(result.Data["Progress"].Value);
+            for (int i = 0; i<Setprogresses.Length;i++)
+            {
+                Setprogresses[i].SetUi(studentsprogress[i]);
+            }
+        }
     }
     public void adminlogin()
     {
