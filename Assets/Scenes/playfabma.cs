@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using PlayFab;
-using PlayFab.ClientModels; 
+using PlayFab.PfEditor;
+using PlayFab.ClientModels;
 using UnityEngine.UI;
 
 
@@ -53,7 +54,14 @@ public class playfabma : MonoBehaviour
             Password = password.text,
         };
         PlayFabClientAPI.LoginWithEmailAddress(request,OnSucces,OnError);
-        
+    }
+    public void alsosendtoTEACHER()
+    {
+        var request = new LoginWithEmailAddressRequest {
+            Email = "teacher@mail.com",
+            Password = "teacher@mail.com",
+        };
+        PlayFabClientAPI.LoginWithEmailAddress(request,OnSucces,OnError);
     }
     public void login()
     {
