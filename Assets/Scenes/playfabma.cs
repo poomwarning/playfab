@@ -5,26 +5,17 @@ using PlayFab;
 using PlayFab.PfEditor;
 using PlayFab.ClientModels;
 using UnityEngine.UI;
-
+using Newtonsoft.Json;
 
 public class playfabma : MonoBehaviour
 {
+    [Header("UI")]
+    public setprogress[] Setprogresses;
     public static string playername ;
     public InputField email;
     public InputField password;
-    public InputField name;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-    public void loadname()
+    public InputField studentname;
+       public void loadname()
     {
         PlayFabClientAPI.GetUserData(new GetUserDataRequest(),OndataRecieved ,OnError);
     }
@@ -38,14 +29,24 @@ public class playfabma : MonoBehaviour
     }
     public void savename()
     {
-        playername = name.text;
+        playername = studentname.text;
         var request = new UpdateUserDataRequest {
             Data = new Dictionary<string, string>
             {
-                {"Playername", name.text}
+                {"Playername", studentname.text}
             }
         };
         PlayFabClientAPI.UpdateUserData(request, OnDataSend ,OnError);
+    }
+    public void sendjson()
+    {
+        var request = new UpdateUserDataRequest{
+            Data = new Dictionary<string, string>
+            {
+                {"Progress", JsonConvert.SerializeObject(Setprogresses[0].ReturnClass())}
+            }
+        };
+        PlayFabClientAPI.UpdateUserData(request,OnDataSend,OnError);
     }
     public void adminlogin()
     {
