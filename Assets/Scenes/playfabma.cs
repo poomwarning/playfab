@@ -76,12 +76,13 @@ public class playfabma : MonoBehaviour
                 new SetObject()
                 {
                     ObjectName = "Playerjson",
-                    DataObject = JsonConvert.SerializeObject(studentsprogress)
+                    EscapedDataObject = JsonConvert.SerializeObject(studentsprogress)
+                
                 }
             }
-   
+    
         };
-        
+        Debug.Log(JsonConvert.SerializeObject(studentsprogress));
         
         PlayFabDataAPI.SetObjects(request2,onSetobjectsend,OnError);
         PlayFabClientAPI.UpdateUserData(request,OnDataSend,OnError);
