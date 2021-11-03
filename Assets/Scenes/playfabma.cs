@@ -112,7 +112,7 @@ public class playfabma : MonoBehaviour
         Debug.Log(getname[0].playertitleID);
         PlayFabProfilesAPI.GetProfile(FriendEntityRequest,reciveobject,OnError); 
        //PlayFabProfilesAPI.GetProfile(new PlayFab.ProfilesModels.GetEntityProfileRequest(),reciveobject,OnError); // get object from cilent to server (this can try friend to cilent server)
-       // PlayFabClientAPI.GetUserData(new GetUserDataRequest(),recvicejson ,OnError); // get normal player data client to server
+       //PlayFabClientAPI.GetUserData(new GetUserDataRequest(),recvicejson ,OnError); // get normal player data client to server
     }
     public void loadfriendDATA()
     {
@@ -142,24 +142,21 @@ public class playfabma : MonoBehaviour
             // Debug.Log("u have friend");
          };
          //Debug.Log(getname.Count);
-         
-         var oof = new GetTitlePlayersFromMasterPlayerAccountIdsRequest()
-         {
-             MasterPlayerAccountIds = new List<string>()
-             {
-                "oof"// getname[0].playertitleID
-             },
-             //TitleId = 
-             
-         };
-         PlayFabProfilesAPI.GetTitlePlayersFromMasterPlayerAccountIds(oof,recivetitleID,OnError);
-         Debug.Log("GetTitleDatafromanotherPlayer");
-         Debug.Log(getname[0].playertitleID);
+          Debug.Log(getname[0].name);
+     }
+    public void getTitleData()
+     {
+          var bigoof = new GetTitlePlayersFromMasterPlayerAccountIdsRequest();
+          bigoof.MasterPlayerAccountIds = new List<string>(){getname[0].playertitleID};
+          
+         PlayFabProfilesAPI.GetTitlePlayersFromMasterPlayerAccountIds(bigoof,recivetitleID,OnError);
      }
          void recivetitleID(GetTitlePlayersFromMasterPlayerAccountIdsResponse result)
      {
-         Debug.Log("get friend title ID");
-           Debug.Log(result.TitleId);
+         //Debug.Log(result.TitleId);
+         Debug.Log(result.TitlePlayerAccounts[getname[0].name].Id);
+         Debug.Log("get friend title ID"+getname[0].displayname);
+         getname[0].playertitleID = result.TitlePlayerAccounts[getname[0].name].Id;
        //  getname[0].playertitleID = result.TitleId;
      }
      void reciveobject(GetEntityProfileResponse result)
