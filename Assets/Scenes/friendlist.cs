@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class friendlist 
 {
-    public string name ;
-    public string displayname;
+    public string masterusername ;
+    public string titledisplayname;
     public string playertitleID ;
     public friendlist(string name,string displayname,string playertitleID)
     {
-        this.name = name;
-        this.displayname = displayname;
+        this.masterusername = name;
+        this.titledisplayname = displayname;
         this.playertitleID = playertitleID;
     }
 }

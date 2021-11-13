@@ -7,7 +7,7 @@ using PlayFab.ClientModels;
 using PlayFab.DataModels;
 using PlayFab.AuthenticationModels;
 using PlayFab.ProfilesModels;
-
+using System.Threading.Tasks;
 using UnityEngine.UI;
 using Newtonsoft.Json;
 
@@ -21,6 +21,8 @@ public class playfabma : MonoBehaviour
     public setprogress[] Setprogresses; //this is objectclass contained value (it can convert to json) stack into array becuz we have many progress each student
     friendlistmono friendobject;
     public static string playername ;
+    public static string playertitieID;
+    public static string localplayfabID;
     public InputField email;
     public InputField password;
     public InputField studentname;
@@ -53,7 +55,7 @@ public class playfabma : MonoBehaviour
     }
     public  void sendjson()
     {
-        List<SetObject> oof = new List<SetObject>();
+       
         List<Progress> studentsprogress = new List<Progress>();
        foreach (var item in Setprogresses)
        {
@@ -76,7 +78,7 @@ public class playfabma : MonoBehaviour
             //Type="title_player_account"
             Entity = new PlayFab.DataModels.EntityKey
             {
-                Id = "D9356F70E28857BC",
+                Id = playertitieID,
                 Type = "title_player_account"
             }
             ,
@@ -91,7 +93,30 @@ public class playfabma : MonoBehaviour
             }
     
         };
-        Debug.Log(JsonConvert.SerializeObject(studentsprogress));
+      
+        //Debug.Log(JsonConvert.SerializeObject(studentsprogress));
+        var request3 = new SetEntityProfilePolicyRequest
+        {
+           Entity = new PlayFab.ProfilesModels.EntityKey()
+           {
+               Id = playertitieID,
+               Type = "title_player_account"
+           },
+           Statements = new List<EntityPermissionStatement>()
+           {
+               new EntityPermissionStatement()
+               {
+                   Action ="Read",
+                   Effect = EffectType.Allow,
+                   Resource = string.Format("pfrn:data--title_player_account!{0}/Profile/Objects/Playerjson",playertitieID),
+                   Principal = "*",
+                   Comment = "PlayerJson",
+                   Condition = null
+               }
+           }
+         
+        };
+        PlayFabProfilesAPI.SetProfilePolicy(request3,OnSetprofilepolicy,OnError);
         PlayFabDataAPI.SetObjects(request2,onSetobjectsend,OnError);
         PlayFabClientAPI.UpdateUserData(request,OnDataSend,OnError);
        // PlayFabClientAPI.UpdatePlayerStatistics(request,OnDataSend,OnError);
@@ -111,8 +136,8 @@ public class playfabma : MonoBehaviour
         };
         Debug.Log(getname[0].playertitleID);
         PlayFabProfilesAPI.GetProfile(FriendEntityRequest,reciveobject,OnError); 
-       //PlayFabProfilesAPI.GetProfile(new PlayFab.ProfilesModels.GetEntityProfileRequest(),reciveobject,OnError); // get object from cilent to server (this can try friend to cilent server)
-       //PlayFabClientAPI.GetUserData(new GetUserDataRequest(),recvicejson ,OnError); // get normal player data client to server
+        //PlayFabProfilesAPI.GetProfile(new PlayFab.ProfilesModels.GetEntityProfileRequest(),reciveobject,OnError); // get object from cilent to server (this can try friend to cilent server)
+      // PlayFabClientAPI.GetUserData(new GetUserDataRequest(),recvicejson ,OnError); // get normal player data client to server
     }
     public void loadfriendDATA()
     {
@@ -142,21 +167,36 @@ public class playfabma : MonoBehaviour
             // Debug.Log("u have friend");
          };
          //Debug.Log(getname.Count);
-          Debug.Log(getname[0].name);
+          Debug.Log(getname[0].masterusername);
      }
     public void getTitleData()
      {
+         int loopx = 0;
+         
           var bigoof = new GetTitlePlayersFromMasterPlayerAccountIdsRequest();
-          bigoof.MasterPlayerAccountIds = new List<string>(){getname[0].playertitleID};
+           bigoof.MasterPlayerAccountIds = new List<string>();
+          foreach(var x in getname)
+          {
+            bigoof.MasterPlayerAccountIds.Add(getname[loopx].playertitleID);
+            // {getname[loopx].playertitleID};
+            loopx++;
+          }
+          
           
          PlayFabProfilesAPI.GetTitlePlayersFromMasterPlayerAccountIds(bigoof,recivetitleID,OnError);
      }
          void recivetitleID(GetTitlePlayersFromMasterPlayerAccountIdsResponse result)
      {
          //Debug.Log(result.TitleId);
-         Debug.Log(result.TitlePlayerAccounts[getname[0].name].Id);
-         Debug.Log("get friend title ID"+getname[0].displayname);
-         getname[0].playertitleID = result.TitlePlayerAccounts[getname[0].name].Id;
+         foreach(var x in getname)
+         {
+             x.playertitleID = result.TitlePlayerAccounts[x.masterusername].Id;
+             Debug.Log(x.playertitleID);
+         }
+         //Debug.Log(result.TitlePlayerAccounts[getname[0].masterusername].Id);
+         
+        // getname[0].playertitleID = result.TitlePlayerAccounts[getname[0].masterusername].Id;
+         //Debug.Log("get friend title ID"+getname[0].titledisplayname);
        //  getname[0].playertitleID = result.TitleId;
      }
      void reciveobject(GetEntityProfileResponse result)
@@ -199,27 +239,44 @@ public class playfabma : MonoBehaviour
         };
         PlayFabClientAPI.LoginWithEmailAddress(request,OnSucces,OnError);
     }
-    public void login()
+    public  void  login()
     {
         var request = new LoginWithCustomIDRequest {
             CustomId = SystemInfo.deviceUniqueIdentifier,
             CreateAccount = true
         };
-        PlayFabClientAPI.LoginWithCustomID(request, OnSucces, OnError);
-        PlayFabAuthenticationAPI.GetEntityToken(new PlayFab.AuthenticationModels.GetEntityTokenRequest(),onGettokenrepon,OnError);
+      
+        PlayFabClientAPI.LoginWithCustomID(request, OnSucces, OnError); 
+        
+       // PlayFabAuthenticationAPI.GetEntityToken(new PlayFab.AuthenticationModels.GetEntityTokenRequest(),onGettokenrepon,OnError);
     }
     public void logout()
     {
         PlayFabClientAPI.ForgetAllCredentials();
     
     }
+    void OnGetcombineinforesult(GetPlayerCombinedInfoResult result)
+    {
+       playertitieID =  result.InfoResultPayload.AccountInfo.TitleInfo.TitlePlayerAccount.Id ;
+       Debug.Log("CurrentTitleID : "+playertitieID);
+    }
     void OnSucces (LoginResult result)
     {
+        localplayfabID = result.PlayFabId;
+        Debug.Log("playfabID :"+localplayfabID);
         Debug.Log("Successful login/account create!");
+        PlayFabClientAPI.GetPlayerCombinedInfo(new GetPlayerCombinedInfoRequest
+        {
+            InfoRequestParameters = new GetPlayerCombinedInfoRequestParams
+            {
+                 GetUserAccountInfo = true
+            }
+        },OnGetcombineinforesult,OnError);
     }
     void onSetobjectsend(SetObjectsResponse result)
     {
-        Debug.Log(result.SetResults);
+        
+        Debug.Log(result.SetResults[0].ObjectName);
         Debug.Log("suck send Setobject");
     
     }
@@ -237,5 +294,26 @@ public class playfabma : MonoBehaviour
     {
         Debug.Log("error to processed");
         Debug.Log(error.GenerateErrorReport());
+    }
+    void OnSetprofilepolicy(SetEntityProfilePolicyResponse result)
+    {
+        Debug.Log("Setpolicy complete");
+        int x1 = 0;
+        if( result.Permissions != null )
+        {
+            foreach(var x in result.Permissions)
+            {
+                if(result.Permissions[x1].Comment == "Playerjson")
+                {
+                    Debug.Log(string.Format("found{0}policy and its contained{1}",x1,result.Permissions[x1].Comment));
+                };
+                x1++;
+            }
+        }
+        else
+        {
+            Debug.Log("cant find shit in policy");
+        }
+       
     }
 }
