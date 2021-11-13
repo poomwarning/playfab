@@ -10,12 +10,14 @@ using PlayFab.ProfilesModels;
 using System.Threading.Tasks;
 using UnityEngine.UI;
 using Newtonsoft.Json;
+using System.Linq;
 
 
 // this code is playfabmanager can use in any secene
 public class playfabma : MonoBehaviour
 {
       List<friendlist> getname = new List<friendlist>();
+      List<Progress> teacherstudentlist = new List<Progress>();
     //INT VALUE to ref in method
     [Header("UI")]
     public setprogress[] Setprogresses; //this is objectclass contained value (it can convert to json) stack into array becuz we have many progress each student
@@ -123,19 +125,25 @@ public class playfabma : MonoBehaviour
     }
     public void loadjson()
     {
+        foreach(var x in getname)
+        {
+            
+        
         var FriendEntityRequest = new PlayFab.ProfilesModels.GetEntityProfileRequest()
         {
             Entity = new PlayFab.ProfilesModels.EntityKey()
             {
-                Id =  getname[0].playertitleID ,
+                //Id =  getname[0].playertitleID ,
+                Id = x.playertitleID,
                 Type = "title_player_account"
             }
             //FriendEntityRequest.Entity = new PlayFab.ProfilesModels.EntityKey()
            
 
         };
-        Debug.Log(getname[0].playertitleID);
+        Debug.Log(x.playertitleID);
         PlayFabProfilesAPI.GetProfile(FriendEntityRequest,reciveobject,OnError); 
+        }
         //PlayFabProfilesAPI.GetProfile(new PlayFab.ProfilesModels.GetEntityProfileRequest(),reciveobject,OnError); // get object from cilent to server (this can try friend to cilent server)
       // PlayFabClientAPI.GetUserData(new GetUserDataRequest(),recvicejson ,OnError); // get normal player data client to server
     }
@@ -156,18 +164,17 @@ public class playfabma : MonoBehaviour
                 // getname.Add();
                  // getname[x].name =  item.FriendPlayFabId;    //result.Friends[x].FriendPlayFabId;
                  //getname[x].name 
-                x++;
+                Debug.Log(getname[x].masterusername);
                 Debug.Log(x);
+                x++;
                 //Debug.Log(item.FriendPlayFabId);
-                 
-                
               //  Debug.Log(getname[x].name);
              }
              Debug.Log("get friend successful");
             // Debug.Log("u have friend");
          };
          //Debug.Log(getname.Count);
-          Debug.Log(getname[0].masterusername);
+         // Debug.Log(getname[0].masterusername);
      }
     public void getTitleData()
      {
@@ -204,13 +211,28 @@ public class playfabma : MonoBehaviour
          
           if(result.Profile.Objects != null&& result.Profile.Objects.ContainsKey("Playerjson"))
           {
-                List<Progress> studentsprogress = JsonConvert.DeserializeObject<List<Progress>>(result.Profile.Objects["Playerjson"].EscapedDataObject);
-            for (int i = 0; i<Setprogresses.Length;i++)
+                  // Debug.Log(JsonConvert.DeserializeObject<Progress>(result.Profile.Objects["Playerjson"].EscapedDataObject));
+                  var oof = JsonConvert.DeserializeObject<Progress>(result.Profile.Objects["Playerjson"].EscapedDataObject);
+                  teacherstudentlist.Add(oof);
+                  Debug.Log(teacherstudentlist.Count);
+                //teacherstudentlist = JsonConvert.DeserializeObject<List<Progress>>(result.Profile.Objects["Playerjson"].EscapedDataObject);
+              
+              
+               // teacherstudentlist = JsonConvert.DeserializeObject<List<Progress>>(result.Profile.Objects["Playerjson"].EscapedDataObject);
+           /* for (int i = 0; i<Setprogresses.Length;i++)
             {
-                Setprogresses[i].SetUi(studentsprogress[i]);
-            }
+                Setprogresses[i].SetUi(teacherstudentlist[i]);
+            }*/
             Debug.Log("recieved student object json data!");
           }
+     }
+
+     public void toframe()
+     {
+         for (int i = 0; i<Setprogresses.Length;i++)
+            {
+                Setprogresses[i].SetUi(teacherstudentlist[i]);
+            }
      }
      void recvicejson(GetUserDataResult result)
     {
