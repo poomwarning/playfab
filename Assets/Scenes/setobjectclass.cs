@@ -17,8 +17,8 @@ public class setobjectclass : MonoBehaviour
         {
             Directory.CreateDirectory(dir);
         }
-        string Json = JsonUtility.ToJson(so);
-       // Json = JsonConvert.SerializeObject(so);
+        //string Json = JsonUtility.ToJson(so);
+         string Json = JsonConvert.SerializeObject(so);
         File.WriteAllText(dir + fileName,Json);
 
     }
@@ -29,7 +29,8 @@ public class setobjectclass : MonoBehaviour
         if(File.Exists(fullPath))
         {
             string json = File.ReadAllText(fullPath);
-            so = JsonUtility.FromJson<Progress>(json);
+            //so = JsonUtility.FromJson<Progress>(json);
+            so = JsonConvert.DeserializeObject<Progress>(json);
         }
         else
         {
