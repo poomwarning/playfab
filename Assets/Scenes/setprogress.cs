@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Newtonsoft.Json;
+[System.Serializable]
 public class Progress 
 {
     public string name;
@@ -15,6 +16,10 @@ public class Progress
         this.rank = rank;
         this.year1 = year1;
         this.accurate = accurate;
+    }
+    public Progress()
+    {
+
     }
 }
 public class setprogress : MonoBehaviour {
