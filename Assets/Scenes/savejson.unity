@@ -157,6 +157,23 @@ MonoBehaviour:
     name: 
     rank: 
     year1: 0
+    statge:
+    - namefuck: 
+      accfuck: 0
+      time: 0
+    - namefuck: 
+      accfuck: 0
+      time: 0
+    - namefuck: 
+      accfuck: 0
+      time: 0
+    - namefuck: 
+      accfuck: 0
+      time: 0
+    - namefuck: 
+      accfuck: 0
+      time: 0
+    arrayfucked: 
     accurate: 0
 --- !u!4 &151952574
 Transform:
